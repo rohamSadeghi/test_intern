@@ -5,8 +5,11 @@
     <title>Title</title>
 </head>
 <body>
-{% for p in products %}
-    <a href={{ p.get_absolute_url }}>{{ p.id }}- {{ p.name }}</a><br>
+{%  for num in numbers %}
+    <p>your number is: {{ num }}</p>
+{% endfor %}
+{% for p in object_list %}
+    <a href={{ p.get_absolute_url }}>{{ p.id }}- {{ p.name }}, rating: {{ p.rating_avg }}</a><br>
 {% endfor %}
 </body>
 </html>
