@@ -17,12 +17,13 @@ from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.urls import path, include
 
-from products.views import home, product_detail_view
+from products.views import home, product_detail_view, CustomLogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', home),
-    path('login/', LoginView.as_view(), 'login'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('products/', include('products.urls')),
 
 ]

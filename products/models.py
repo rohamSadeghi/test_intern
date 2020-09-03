@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.functions import Coalesce
 from django.urls import reverse
 
 
@@ -22,6 +23,10 @@ class Store(models.Model):
 
 
 class Product(models.Model):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._rating = None
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=50)
@@ -41,12 +46,15 @@ class Product(models.Model):
         return reverse('product-detail', kwargs={'pk': self.pk})
 
     def rating(self):
-        return ProductRating.objects.filter(
-            product=self
-        ).aggregate(
-            avg_rating=models.Avg('rate'),
-            rating_count=models.Count('id')
-        )
+        if self._rating is None:
+            self._rating =  ProductRating.objects.filter(
+                product=self
+            ).aggregate(
+                avg_rating=Coalesce(models.Avg('rate'), 0),
+                rating_count=models.Count('id')
+            )
+        return self._rating
+
 
     def rating_avg(self):
         return self.rating()['avg_rating']

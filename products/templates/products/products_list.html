@@ -5,11 +5,12 @@
     <title>Title</title>
 </head>
 <body>
-{%  for num in numbers %}
-    <p>your number is: {{ num }}</p>
-{% endfor %}
+{% if authenticated %}
+<a href={% url 'logout' %}>Logout</a>
+{% endif %}<br>
+
 {% for p in object_list %}
-    <a href={{ p.get_absolute_url }}>{{ p.id }}- {{ p.name }}, rating: {{ p.rating_avg }}</a><br>
+    <a href={{ p.get_absolute_url }}>{{ p.id }}- {{ p.name }}, rating: {{ p.rating_avg }}, rating count: {{ p.rating_count }}</a><br>
 {% endfor %}
 </body>
 </html>

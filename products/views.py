@@ -1,5 +1,9 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LogoutView
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from products.forms import ProductForm, RateForm
 from products.models import Product, Store, ProductRating
@@ -52,7 +56,7 @@ class ProductListView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
-        context['numbers'] = ['a', 'b']
+        context['authenticated'] = self.request.user and self.request.user.is_authenticated
         return context
 
 class ProductDetailView(DetailView):
@@ -71,15 +75,49 @@ class ProductUpdateView(UpdateView):
     form_class = ProductForm
     model = Product
 
-class RateView(CreateView):
+class RateView(LoginRequiredMixin, CreateView):
+    login_url = reverse_lazy('login')
     model = ProductRating
     form_class = RateForm
     template_name = "products/product_rate_create.html"
 
-    # def form_valid(self, form):
-    #     super().form_valid(form=form)
-    #     user = self.request.user
-    #     product = get_object_or_404(Product, id=self.kwargs.get('pk'))
-    #     form.cleaned_data['user'] = user
-    #     form.cleaned_data['product'] = product
-    #     return form
+    def get_success_url(self):
+        return reverse('products-list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['product'] = get_object_or_404(Product, id=self.kwargs.get('pk'))
+        return context
+
+    def form_valid(self, form):
+        user = self.request.user
+        product = self.get_context_data()['product']
+        ProductRating.objects.update_or_create(
+            user=user,
+            product=product,
+            defaults={
+                'rate':
+                    form.cleaned_data['rate']
+            }
+        )
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class RateDeleteView(LoginRequiredMixin, DeleteView):
+    model = ProductRating
+    login_url = reverse_lazy('login')
+    template_name = 'products/rate_delete.html'
+
+
+    def delete(self, request, *args, **kwargs):
+        obj = get_object_or_404(ProductRating, **{'user': self.request.user, 'id': self.kwargs.get('pk')})
+        obj.delete()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('products-list')
+
+
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('login')

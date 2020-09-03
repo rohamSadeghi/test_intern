@@ -18,4 +18,4 @@ class RawProductForm(forms.Form):
 class RateForm(forms.ModelForm):
     class Meta:
         model = ProductRating
-        fields = ['product', 'rate', 'user']
+        fields = ['rate', ]
