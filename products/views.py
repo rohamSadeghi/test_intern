@@ -6,7 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from products.forms import ProductForm, RateForm
-from products.models import Product, Store, ProductRating
+from products.models import Product, Store, ProductRating, Category
 
 
 def home(request):
@@ -117,6 +117,15 @@ class RateDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse('products-list')
 
+
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'products/category_list.html'
+
+
+class CategoryDetailView(DetailView):
+    model = Category
+    template_name = 'products/category_detail.html'
 
 
 class CustomLogoutView(LogoutView):

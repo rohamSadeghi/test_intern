@@ -8,11 +8,13 @@ from products.views import (
     ProductListView,
     ProductDetailView,
     ProductCreateView,
-    ProductUpdateView, RateView, RateDeleteView
+    ProductUpdateView, RateView, RateDeleteView, CategoryListView, CategoryDetailView
 )
 
 urlpatterns = [
     path('<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
+    path('categories/', CategoryListView.as_view(), name='categories-list'),
+    path('categories/<int:pk>/', CategoryDetailView.as_view(), name='categories-detail'),
     path('', ProductListView.as_view(), name='products-list'),
     path('stores/', stores_list, name='stores-list'),
     path('create-product/', ProductCreateView.as_view(), name='create-product'),

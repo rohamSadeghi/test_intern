@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h3>Category: {{ object.name }}</h3>
+{% for product in object.products.all %}
+
+<ul>
+    <li>
+    {{ product.id }}- {{ product.name }}
+    </li>
+</ul>
+{% endfor %}
+</body>
+</html>
