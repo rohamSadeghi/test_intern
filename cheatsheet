@@ -1,0 +1,10 @@
+Install pgadmin:
+https://unix.stackexchange.com/questions/467873/how-to-install-pgadmin-4-on-linux-mint
+
+RESET PASSWORD for postgres
+
+$ sudo su
+$ su - postgres
+$ psql
+postgres=# alter user postgres with password '1qazXSW@';
+$ service postgresql restart
