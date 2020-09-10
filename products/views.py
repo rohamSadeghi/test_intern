@@ -5,8 +5,8 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from products.forms import ProductForm, RateForm
-from products.models import Product, Store, ProductRating, Category
+from products.forms import ProductForm, RateForm, BookmarkForm
+from products.models import Product, Store, ProductRating, Category, ProductBookmark
 
 
 def home(request):
@@ -62,6 +62,18 @@ class ProductListView(ListView):
 class ProductDetailView(DetailView):
     template_name = "products/product_detail.html"
     model = Product
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        user = self.request.user
+        if user and user.is_authenticated:
+            product = self.get_object()
+            context['bookmark'] = False
+            try:
+                context['bookmark'] = ProductBookmark.objects.get(user=user, product=product).like_status
+            except ProductBookmark.DoesNotExist:
+                pass
+            return context
 
 
 class ProductCreateView(CreateView):
@@ -130,3 +142,23 @@ class CategoryDetailView(DetailView):
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('login')
+
+
+class BookmarkCreateView(LoginRequiredMixin, CreateView):
+    login_url = reverse_lazy('login')
+    form_class = BookmarkForm
+    model = ProductBookmark
+    template_name = 'products/create_bookmark.html'
+
+    def get_success_url(self):
+        return reverse('product-detail', kwargs={'pk': self.kwargs.get('pk')})
+
+    def form_valid(self, form):
+        product = get_object_or_404(Product, pk=self.kwargs.get('pk'))
+        user = self.request.user
+        ProductBookmark.objects.update_or_create(
+            user=user,
+            product=product,
+            defaults={"like_status": form.cleaned_data.get('like_status', False)}
+        )
+        return HttpResponseRedirect(self.get_success_url())

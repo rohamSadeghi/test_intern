@@ -1,6 +1,6 @@
 from django import forms
 
-from products.models import Product, ProductRating
+from products.models import Product, ProductRating, ProductBookmark
 
 
 class ProductForm(forms.ModelForm):
@@ -19,3 +19,9 @@ class RateForm(forms.ModelForm):
     class Meta:
         model = ProductRating
         fields = ['rate', ]
+
+
+class BookmarkForm(forms.ModelForm):
+    class Meta:
+        model = ProductBookmark
+        fields = ['like_status',]
