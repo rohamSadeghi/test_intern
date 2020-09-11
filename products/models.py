@@ -1,9 +1,11 @@
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Coalesce
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 
 def product_images_path(instance, filename):
@@ -25,6 +27,10 @@ class Store(models.Model):
 
     products = models.ManyToManyField('Product', related_name='stores')
 
+    class Meta:
+        verbose_name = _('Store')
+        verbose_name_plural = _('Stores')
+
     def __str__(self):
         return self.name
 
@@ -34,12 +40,17 @@ class Category(models.Model):
     updated_time = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=50)
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='categories')
+    properties = JSONField(default=dict)
     is_enable = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _('Category')
+        verbose_name_plural = _('Categories')
 
     def clean(self):
         super().clean()
         if self.parent and self == self.parent.parent:
-            raise ValidationError("This category is somehow a child category and can not be parent again")
+            raise ValidationError(_("This category is somehow a child category and can not be parent again"))
 
     def __str__(self):
         return self.name
@@ -57,13 +68,29 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     image = models.ImageField(blank=True, upload_to=product_images_path)
     is_enable = models.BooleanField(default=True)
-    objects = models.Manager()
-    enables = EnableManager()
+    properties = JSONField(default=dict)
 
     categories = models.ManyToManyField('Category', related_name='products')
 
+    objects = models.Manager()
+    enables = EnableManager()
+
+    class Meta:
+        verbose_name = _('Product')
+        verbose_name_plural = _('Products')
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        old_image = ''
+        if self.image:
+            old_image = self.image
+            self.image = ''
+            super().save(*args, **kwargs)
+        self.image = old_image
+        super().save(*args, **kwargs)
+
 
     def get_absolute_url(self):
         return reverse('product-detail', kwargs={'pk': self.pk})
@@ -93,6 +120,8 @@ class ProductRating(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
+        verbose_name = _('Product rating')
+        verbose_name_plural = _('Product ratings')
         constraints = [
             models.UniqueConstraint(fields=['user', 'product'], name='unique_product_user')
             ]
@@ -112,6 +141,17 @@ class ProductBookmark(models.Model):
     like_status = models.BooleanField(default=True)
 
     class Meta:
+        verbose_name = _('Product bookmark')
+        verbose_name_plural = _('Product bookmarks')
         constraints = [
             models.UniqueConstraint(fields=['user', 'product'], name='unique_product_user_bookmark')
             ]
+
+
+class ProductComment(models.Model):
+    created_time = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comment_users')
+    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='comment_approved_users', editable=False)
+    approved_time = models.DateTimeField(blank=True, editable=False)
+    content = models.TextField()

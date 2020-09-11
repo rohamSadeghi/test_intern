@@ -139,6 +139,16 @@ class CategoryDetailView(DetailView):
     model = Category
     template_name = 'products/category_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        products_properties = {}
+        category = self.get_object()
+
+        for p in category.properties:
+            products_properties[p] = category.products.values_list(f'properties__{p}', flat=True)
+        context['properties'] = products_properties
+        return context
+
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('login')

@@ -29,4 +29,5 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['is_enable', ]
     autocomplete_fields = ['categories', ]
     search_fields = ['name', ]
+    # list_per_page = 4
 
