@@ -146,12 +146,3 @@ class ProductBookmark(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user', 'product'], name='unique_product_user_bookmark')
             ]
-
-
-class ProductComment(models.Model):
-    created_time = models.DateTimeField(auto_now_add=True)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comment_users')
-    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE, related_name='comment_approved_users', editable=False)
-    approved_time = models.DateTimeField(blank=True, editable=False)
-    content = models.TextField()

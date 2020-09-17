@@ -44,6 +44,10 @@ INSTALLED_APPS = [
 
     # Local
     'products',
+    'commenting',
+
+    # Third parties
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

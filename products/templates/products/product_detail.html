@@ -10,7 +10,12 @@
         No
     {% endif %}
     </h5>
+    {% if object.image %}
     <img src="{{ object.image.url }}" alt="{{ object.name }}">
+    {% endif %}
+    {% for c in object.comments.approves.all %}
+        {{ c.id }}- {{ c.content }}
+    {% endfor %}
 {% endblock %}
 
     <h1>Hello</h1>

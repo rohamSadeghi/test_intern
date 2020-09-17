@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 from products.views import (
     product_detail_view,
@@ -22,4 +22,7 @@ urlpatterns = [
     path('<int:pk>/update/', ProductUpdateView.as_view(), name='product-update'),
     path('<int:pk>/rate/', RateView.as_view(), name='product-rate'),
     path('<int:pk>/rate-delete/', RateDeleteView.as_view(), name='product-rate-delete'),
+
+    # APIs
+    path('api/', include('products.api.urls')),
 ]
