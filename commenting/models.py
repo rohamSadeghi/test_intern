@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class ApprovedManager(models.Manager):
+    use_for_related_fields = True
     def get_queryset(self):
         return super().get_queryset().filter(approved_by__isnull=False)
 

@@ -31,3 +31,4 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name', ]
     # list_per_page = 4
 
+admin.site.register(ProductBookmark)
