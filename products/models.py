@@ -15,6 +15,12 @@ class EnableManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_enable=True)
 
+
+class ParentManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(parent__isnull=True)
+
+
 class Store(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
@@ -39,9 +45,12 @@ class Category(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=50)
-    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='categories')
+    parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE, related_name='children')
     properties = JSONField(default=dict)
     is_enable = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    parents = ParentManager()
 
     class Meta:
         verbose_name = _('Category')
@@ -116,8 +125,8 @@ class ProductRating(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     updated_time = models.DateTimeField(auto_now=True)
     rate = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='rates')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='rates')
 
     class Meta:
         verbose_name = _('Product rating')

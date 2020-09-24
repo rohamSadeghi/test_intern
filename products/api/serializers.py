@@ -4,9 +4,14 @@ from products.models import Product, Category, ProductBookmark, ProductRating
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+
     class Meta:
         model = Category
-        fields = ['id', 'name', 'created_time', ]
+        fields = ['id', 'name', 'created_time', 'children']
+
+    def get_children(self, obj):
+        return CategorySerializer(obj.children.all(), many=True).data
 
 class ProductSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many=True)
