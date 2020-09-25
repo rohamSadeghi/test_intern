@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Local
     'products',
     'commenting',
+    'accounts',
 
     # Third parties
     'rest_framework',
@@ -97,7 +98,14 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
+AUTH_USER_MODEL = 'accounts.User'
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -116,6 +124,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 3
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

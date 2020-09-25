@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -12,8 +14,9 @@ from rest_framework.viewsets import GenericViewSet
 from commenting.api.serializers import CommentSerializer
 from commenting.models import ProductComment
 from products.api.serializers import ProductSerializer, CategorySerializer, BookmarkSerializer, RatingSerializer
-from products.filters import CustomOrdering
+from utils.filters import CustomOrdering
 from products.models import Product, Category
+from utils.paginations import CustomLimitOffsetPagination, CustomPageNumberPagination
 
 
 class InitialView(APIView):
@@ -27,7 +30,8 @@ class InitialView(APIView):
 
 class CategoryViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     serializer_class = CategorySerializer
-    queryset = Category.parents.all()
+    queryset = Category.parents.filter(is_enable=True).all()
+    pagination_class = CustomPageNumberPagination
     # lookup_url_kwarg = 'id'
 
     # def retrieve(self, request, *args, **kwargs):
@@ -40,6 +44,18 @@ class CategoryViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
         if self.action == 'retrieve':
             return Category.objects.all()
         return super().get_queryset()
+
+    @method_decorator(cache_page(30))
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     # def retrieve(self, request, *args, **kwargs):
     #     category = self.get_object()
@@ -55,6 +71,7 @@ class CategoryViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 class ProductViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     authentication_classes = [TokenAuthentication, ]
     permission_classes = [IsAuthenticatedOrReadOnly,]
+    pagination_class = CustomLimitOffsetPagination
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, CustomOrdering, SearchFilter]
     search_fields = ['name', 'categories__name']
