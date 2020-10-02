@@ -8,3 +8,17 @@ $ su - postgres
 $ psql
 postgres=# alter user postgres with password '1qazXSW@';
 $ service postgresql restart
+
+
+### ENV variables ###
+DEBUG = True
+DEVEL = True
+SECRET_KEY = ko4l&^)+b!ezmwh77t8cnx2_we-($^b_vj4%s#+aw0s&w#gj8^
+ALLOWED_HOSTS = 127.0.0.1, localhost
+
+# Database configs
+DB_NAME = test_intern_c
+DB_USER = postgres
+DB_PASS = 1qazXSW@
+DB_HOST = localhost
+DB_PORT = 5432
