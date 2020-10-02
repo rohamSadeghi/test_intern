@@ -28,5 +28,6 @@ urlpatterns = [
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('products/', include('products.urls')),
     path('api/comments/', include('commenting.api.urls')),
+    path('api/accounts/', include('accounts.api.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

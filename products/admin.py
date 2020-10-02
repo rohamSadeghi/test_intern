@@ -1,15 +1,19 @@
 from django.contrib import admin
-
+from django import forms
+from prettyjson import PrettyJSONWidget
 from products.models import Store, Product, ProductRating, Category, ProductBookmark
 
-# admin.site.register(Store)
-# admin.site.register(Category)
-# admin.site.register(Product)
-# admin.site.register(ProductRating)
-# admin.site.register(ProductBookmark)
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = '__all__'
+        widgets = {'properties': PrettyJSONWidget()}
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    form = CategoryForm
     list_display = ['name', 'parent', 'is_enable', 'created_time']
     list_filter = ['is_enable', ]
     raw_id_fields = ['parent',]

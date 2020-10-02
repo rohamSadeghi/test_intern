@@ -1,6 +1,7 @@
 Django==2.2.14
 django-filter==2.3.0
 djangorestframework==3.11.1
+djangorestframework-simplejwt==4.4.0
 python-decouple==3.3
 python-memcached==1.59
 Pillow==7.2.0

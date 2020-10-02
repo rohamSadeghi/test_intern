@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from utils.custom_fields import CustomBigIntegerField
 from utils.validators import clean_phone_number_validator
 
 
@@ -39,7 +40,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    phone_number = models.BigIntegerField(_("phone number"), unique=True, validators=[clean_phone_number_validator])
+    phone_number = CustomBigIntegerField(_("phone number"), unique=True, validators=[clean_phone_number_validator])
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -64,5 +65,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
 
+    def set_verify_code(self, verify_code):
+        self.verify_codes.create(verification_code=verify_code)
+
     def __str__(self):
         return str(self.phone_number)
+
+
+class VerifyCode(models.Model):
+    created_time = models.DateTimeField(_("created time"), auto_now_add=True)
+    user = models.ForeignKey('User', verbose_name=_("user"), on_delete=models.CASCADE, related_name='verify_codes')
+    verification_code = models.PositiveIntegerField(_("verification code"))
+    verify_time = models.DateTimeField(_("verify_time"), blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = _("Verify codes")
+        verbose_name = _("Verify code")
+        indexes = [
+            models.Index(
+            fields=['user', 'verification_code'],
+            name='index_user_code'
+            )
+        ]

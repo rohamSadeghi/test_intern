@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -35,3 +36,15 @@ class ProductComment(models.Model):
     def is_approved(self):
         return bool(self.approved_by)
     is_approved.boolean = True
+
+
+class CommentVote(models.Model):
+    created_time = models.DateTimeField(_("created time"), auto_now_add=True)
+    updated_time = models.DateTimeField(_("updated time"), auto_now=True)
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, verbose_name=_("user"))
+    comment = models.ForeignKey('ProductComment', on_delete=models.CASCADE, verbose_name=_("comment"))
+    vote = models.SmallIntegerField(_('vote'), validators=[MinValueValidator(-1), MaxValueValidator(1)])
+
+    class Meta:
+        verbose_name_plural = _("Comment votes")
+        verbose_name = _("Comment vote")
