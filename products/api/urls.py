@@ -5,8 +5,8 @@ from rest_framework.routers import SimpleRouter
 from products.api.views import InitialView, ProductViewSet, CategoryViewSet
 
 router = SimpleRouter()
-router.register('categories', CategoryViewSet)
-router.register('products', ProductViewSet)
+router.register('categories', CategoryViewSet, basename='categories')
+router.register('products', ProductViewSet, basename='products')
 
 
 urlpatterns = [

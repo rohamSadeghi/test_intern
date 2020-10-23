@@ -19,7 +19,11 @@ from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.urls import path, include
 
+from rest_framework_swagger.views import get_swagger_view
+
 from products.views import home, product_detail_view, CustomLogoutView
+
+schema_view = get_swagger_view(title='Shop APIs')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +31,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('products/', include('products.urls')),
+    path('api/docs/', schema_view),
     path('api/comments/', include('commenting.api.urls')),
     path('api/accounts/', include('accounts.api.urls')),
 

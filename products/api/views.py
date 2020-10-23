@@ -70,6 +70,17 @@ class CategoryViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
 
 
 class ProductViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    """
+        list:
+            Return list of products order by most recently added.
+
+            query parameters
+            filter fields -> price. Ex: ?q=price
+
+        bookmark:
+            Set a product as favorite item of user based on product id.
+
+    """
     serializer_class = ProductSerializer
     queryset = Product.objects.filter(is_enable=True)
     authentication_classes = [JWTAuthentication, ]

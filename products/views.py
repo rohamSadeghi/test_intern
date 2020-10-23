@@ -10,6 +10,11 @@ from products.models import Product, Store, ProductRating, Category, ProductBook
 
 
 def home(request):
+    """
+    home template view
+    :param request: request
+    :return: render
+    """
     return render(request, 'base.html')
 
 def product_detail_view(request, pk):

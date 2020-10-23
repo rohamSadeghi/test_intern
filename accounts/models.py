@@ -40,6 +40,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    first_name = models.CharField(_("first name"), max_length=50, blank=True)
+    last_name = models.CharField(_("last name"), max_length=50, blank=True)
     phone_number = CustomBigIntegerField(_("phone number"), unique=True, validators=[clean_phone_number_validator])
     is_staff = models.BooleanField(
         _('staff status'),
@@ -59,7 +61,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     class Meta:
         verbose_name = _('User')

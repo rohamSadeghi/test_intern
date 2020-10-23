@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     'prettyjson',
     'rest_framework_simplejwt',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
@@ -125,6 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 3,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 
     # 'DEFAULT_THROTTLE_CLASSES': [
     #     'rest_framework.throttling.AnonRateThrottle',
